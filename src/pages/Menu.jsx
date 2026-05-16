@@ -1,48 +1,31 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { CartContext } from '../context/CartContext';
-
-const menuItems = [
-    {
-        name: 'Classic Burger',
-        price: 8.99,
-        description: 'Juicy flame-grilled beef patty with lettuce, tomato, and our signature sauce.',
-        image: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=400'
-    },
-    {
-        name: 'Loaded Fries',
-        price: 4.99,
-        description: 'Crunchy fries topped with cheese, bacon, and our signature sauce.',
-        image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400'
-    },
-    {
-        name: 'Cheese Pizza',
-        price: 12.99,
-        description: 'Classic pizza with a crispy crust, tangy tomato sauce, and melted mozzarella.',
-        image: 'https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?w=400'
-    },
-    {
-        name: 'Crispy Chicken Sandwich',
-        price: 9.49,
-        description: 'Golden fried chicken with lettuce, tomato, and house sauce.',
-        image: 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=400'
-    },
-    {
-        name: 'Classic Cola',
-        price: 2.49,
-        description: 'Refreshing chilled cola served over ice.',
-        image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400'
-    },
-    {
-        name: 'Strawberry Smoothie',
-        price: 4.99,
-        description: 'Creamy smoothie blended with fresh strawberries.',
-        image: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400'
-    }
-];
+import { getMenuItems } from '../api/apiService';
 
 export default function Menu() {
     const { addToCart } = useContext(CartContext);
+    const [menuItems, setMenuItems] = useState([]);
     const [addedItems, setAddedItems] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchMenuItems = async () => {
+            try {
+                setLoading(true);
+                const items = await getMenuItems();
+                setMenuItems(items);
+                setError(null);
+            } catch (err) {
+                console.error('Error loading menu:', err);
+                setError('Failed to load menu items. Please try again later.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMenuItems();
+    }, []);
 
     const handleAddToCart = (item) => {
         addToCart(item);
@@ -54,8 +37,11 @@ export default function Menu() {
 
     return (
         <section className="menu-container">
-            {menuItems.map(item => (
-                <div key={item.name} className="menu-card">
+            {loading && <p className="loading">Loading menu items...</p>}
+            {error && <p className="error">{error}</p>}
+            {!loading && !error && menuItems.length === 0 && <p>No menu items available.</p>}
+            {!loading && !error && menuItems.map(item => (
+                <div key={item._id} className="menu-card">
                     <img src={item.image} alt={item.name} />
                     <h3>{item.name}</h3>
                     <p>{item.description}</p>

@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { createOrder as submitOrder } from '../api/apiService';
 
 export const CartContext = createContext();
 
@@ -13,11 +14,11 @@ export const CartProvider = ({ children }) => {
     }, [cart]);
 
     const addToCart = (item) => {
-        const existingItem = cart.find(cartItem => cartItem.name === item.name);
+        const existingItem = cart.find(cartItem => cartItem._id === item._id);
 
         if (existingItem) {
             setCart(cart.map(cartItem =>
-                cartItem.name === item.name
+                cartItem._id === item._id
                     ? { ...cartItem, quantity: cartItem.quantity + 1 }
                     : cartItem
             ));
@@ -26,16 +27,16 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    const removeFromCart = (itemName) => {
-        setCart(cart.filter(item => item.name !== itemName));
+    const removeFromCart = (itemId) => {
+        setCart(cart.filter(item => item._id !== itemId));
     };
 
-    const updateQuantity = (itemName, quantity) => {
+    const updateQuantity = (itemId, quantity) => {
         if (quantity <= 0) {
-            removeFromCart(itemName);
+            removeFromCart(itemId);
         } else {
             setCart(cart.map(item =>
-                item.name === itemName ? { ...item, quantity } : item
+                item._id === itemId ? { ...item, quantity } : item
             ));
         }
     };
@@ -54,6 +55,36 @@ export const CartProvider = ({ children }) => {
         return cart.reduce((count, item) => count + item.quantity, 0);
     };
 
+    const checkout = async (customerInfo) => {
+        try {
+            if (cart.length === 0) {
+                throw new Error('Cart is empty');
+            }
+
+            const orderItems = cart.map(item => ({
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity
+            }));
+
+            const orderData = {
+                items: orderItems,
+                total: parseFloat(getCartTotal()),
+                customerInfo
+            };
+
+            const order = await submitOrder(orderData);
+            
+            // Clear cart after successful order
+            setCart([]);
+            
+            return order;
+        } catch (error) {
+            console.error('Checkout error:', error);
+            throw error;
+        }
+    };
+
     return (
         <CartContext.Provider value={{
             cart,
@@ -62,7 +93,8 @@ export const CartProvider = ({ children }) => {
             updateQuantity,
             clearCart,
             getCartTotal,
-            getCartCount
+            getCartCount,
+            checkout
         }}>
             {children}
         </CartContext.Provider>
