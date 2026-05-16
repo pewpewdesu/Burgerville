@@ -30,7 +30,7 @@ git push origin main
 4. Add the following variables:
 
 ```
-MONGODB_URI = mongodb+srv://harwinhe82_db_user:xQUBitY3Ka95J8fd@burgervillecluster.g9z54wh.mongodb.net/burgerville?retryWrites=true&w=majority
+MONGODB_URI = mongodb+srv://[YOUR_USERNAME]:[YOUR_PASSWORD]@[YOUR_CLUSTER].mongodb.net/burgerville?retryWrites=true&w=majority
 NODE_ENV = production
 CORS_ORIGIN = https://your-project-name.vercel.app
 ```
