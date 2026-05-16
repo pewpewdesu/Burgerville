@@ -9,12 +9,6 @@
             "destination": "/api/index.js"
         }
     ],
-    "env": {
-        "MONGODB_URI": "@mongodb_uri",
-        "NODE_ENV": "production",
-        "CORS_ORIGIN": "@cors_origin",
-        "VITE_API_URL": "/api"
-    },
     "functions": {
         "api/index.js": {
             "maxDuration": 30
