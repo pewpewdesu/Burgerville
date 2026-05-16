@@ -74,10 +74,10 @@ export const CartProvider = ({ children }) => {
             };
 
             const order = await submitOrder(orderData);
-            
+
             // Clear cart after successful order
             setCart([]);
-            
+
             return order;
         } catch (error) {
             console.error('Checkout error:', error);

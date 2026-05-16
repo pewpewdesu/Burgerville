@@ -120,17 +120,17 @@ export default function CartModal({ isOpen, onClose }) {
                                 ></textarea>
                             </div>
                             <div className="form-buttons">
-                                <button 
-                                    type="button" 
-                                    className="btn-back" 
+                                <button
+                                    type="button"
+                                    className="btn-back"
                                     onClick={() => setShowCheckoutForm(false)}
                                     disabled={isProcessing}
                                 >
                                     Back
                                 </button>
-                                <button 
-                                    type="submit" 
-                                    className="btn-submit" 
+                                <button
+                                    type="submit"
+                                    className="btn-submit"
                                     disabled={isProcessing}
                                 >
                                     {isProcessing ? 'Processing...' : 'Place Order'}
@@ -181,8 +181,8 @@ export default function CartModal({ isOpen, onClose }) {
                                 }}>
                                     Clear Cart
                                 </button>
-                                <button 
-                                    className="btn-checkout" 
+                                <button
+                                    className="btn-checkout"
                                     onClick={() => setShowCheckoutForm(true)}
                                     disabled={cart.length === 0}
                                 >
