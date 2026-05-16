@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "mongodb": "^7.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2"
