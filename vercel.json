@@ -3,12 +3,6 @@
     "devCommand": "npm run dev",
     "installCommand": "npm install --include=dev && cd backend && npm install && cd ..",
     "framework": "vite",
-    "rewrites": [
-        {
-            "source": "/api/(.*)",
-            "destination": "/api/index.js"
-        }
-    ],
     "functions": {
         "api/index.js": {
             "maxDuration": 30

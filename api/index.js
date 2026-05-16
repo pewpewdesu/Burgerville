@@ -79,11 +79,11 @@ app.use(async (req, res, next) => {
 });
 
 // Routes
-app.use('/menu', menuRoutes);
-app.use('/orders', orderRoutes);
+app.use('/api/menu', menuRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
     res.status(200).json({
         success: true,
         message: 'Server is running',
