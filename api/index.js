@@ -3,9 +3,11 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-// Load environment variables
-dotenv.config({ path: '.env' });
-dotenv.config({ path: '.env.local' });
+// Load environment variables (only in local development)
+if (process.env.NODE_ENV !== 'production') {
+    dotenv.config({ path: '.env' });
+    dotenv.config({ path: '.env.local' });
+}
 
 // Import routes
 import menuRoutes from '../backend/routes/menuRoutes.js';
@@ -14,13 +16,19 @@ import orderRoutes from '../backend/routes/orderRoutes.js';
 const app = express();
 
 // Get configuration from environment
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/burgerville';
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
+const MONGODB_URI = process.env.MONGODB_URI;
+const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
+
+// Log configuration (for debugging)
+if (process.env.NODE_ENV === 'development') {
+    console.log('MongoDB URI:', MONGODB_URI ? 'Configured' : 'NOT CONFIGURED');
+    console.log('CORS Origin:', CORS_ORIGIN);
+}
 
 // Middleware
 app.use(cors({
-    origin: [CORS_ORIGIN, 'http://localhost:3000', 'http://localhost:5173'],
-    credentials: true
+    origin: CORS_ORIGIN === '*' ? '*' : [CORS_ORIGIN, 'http://localhost:3000', 'http://localhost:5173'],
+    credentials: CORS_ORIGIN !== '*'
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -31,6 +39,12 @@ let isConnected = false;
 const connectDB = async () => {
     if (isConnected) {
         return;
+    }
+
+    if (!MONGODB_URI) {
+        const err = new Error('MONGODB_URI environment variable is not set');
+        console.error('✗ MongoDB configuration error:', err.message);
+        throw err;
     }
 
     try {
@@ -55,20 +69,21 @@ app.use(async (req, res, next) => {
         await connectDB();
         next();
     } catch (err) {
+        console.error('Database connection failed for request:', req.path, err.message);
         res.status(503).json({
             success: false,
             message: 'Database connection error',
-            error: err.message
+            error: process.env.NODE_ENV === 'development' ? err.message : 'Database unavailable'
         });
     }
 });
 
 // Routes
-app.use('/api/menu', menuRoutes);
-app.use('/api/orders', orderRoutes);
+app.use('/menu', menuRoutes);
+app.use('/orders', orderRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
     res.status(200).json({
         success: true,
         message: 'Server is running',
